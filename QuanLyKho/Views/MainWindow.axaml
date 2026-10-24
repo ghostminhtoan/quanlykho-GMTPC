@@ -1,0 +1,14 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:QuanLyKho.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="using:QuanLyKho.Views"
+        mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="750"
+        Width="1100" Height="750"
+        MinWidth="420" MinHeight="600"
+        x:Class="QuanLyKho.Views.MainWindow"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Quản Lý Kho Hàng - Đa Nền Tảng (Windows &amp; Android)">
+        <views:MainView />
+</Window>

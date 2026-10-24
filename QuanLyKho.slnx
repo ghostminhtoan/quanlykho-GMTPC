@@ -1,0 +1,11 @@
+﻿<Solution>
+  <Project Path="QuanLyKho.Android/QuanLyKho.Android.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="QuanLyKho.Browser/QuanLyKho.Browser.csproj" />
+  <Project Path="QuanLyKho.Desktop/QuanLyKho.Desktop.csproj" />
+  <Project Path="QuanLyKho.iOS/QuanLyKho.iOS.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="QuanLyKho/QuanLyKho.csproj" />
+</Solution>

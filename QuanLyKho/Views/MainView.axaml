@@ -1,0 +1,446 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:QuanLyKho.ViewModels"
+             xmlns:models="using:QuanLyKho.Models"
+             mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="750"
+             x:Class="QuanLyKho.Views.MainView"
+             x:DataType="vm:MainViewModel">
+
+    <Grid>
+        <!-- Main Layout -->
+        <Grid RowDefinitions="Auto,Auto,*" Background="#0F172A">
+            <!-- 1. TOP BANNER -->
+            <Border Grid.Row="0" Background="#1E293B" BorderBrush="#334155" BorderThickness="0,0,0,1" Padding="20,16">
+                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                    <!-- Title & Logo -->
+                    <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                        <Border Background="#2563EB" CornerRadius="8" Width="42" Height="42" VerticalAlignment="Center">
+                            <TextBlock Text="📦" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="HỆ THỐNG QUẢN LÝ KHO HÀNG" FontSize="18" FontWeight="Bold" Foreground="#F8FAFC"/>
+                            <TextBlock Text="Đa Nền Tảng: Windows &amp; Android | Lưu Trữ Ngoại Tuyến (Offline SQLite)" FontSize="12" Foreground="#94A3B8"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Real-time Clock -->
+                    <Border Grid.Row="0" Grid.Column="1" Background="#0F172A" CornerRadius="8" Padding="12,6" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="🕒" VerticalAlignment="Center" FontSize="14"/>
+                            <TextBlock Text="{Binding CurrentTimeText}" Foreground="#38BDF8" FontWeight="SemiBold" VerticalAlignment="Center" FontSize="13"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- KPI Cards (Banner summary) -->
+                    <WrapPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="0,16,0,0">
+                        <!-- Card 1: Total Products -->
+                        <Border Background="#0F172A" BorderBrush="#3B82F6" BorderThickness="1" CornerRadius="10" Padding="16,10" Margin="0,0,12,8" MinWidth="180">
+                            <StackPanel>
+                                <TextBlock Text="TỔNG MẶT HÀNG" FontSize="11" Foreground="#94A3B8" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding TotalProducts}" FontSize="24" FontWeight="Bold" Foreground="#3B82F6" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Card 2: Total Stock -->
+                        <Border Background="#0F172A" BorderBrush="#10B981" BorderThickness="1" CornerRadius="10" Padding="16,10" Margin="0,0,12,8" MinWidth="180">
+                            <StackPanel>
+                                <TextBlock Text="TỔNG TỒN KHO" FontSize="11" Foreground="#94A3B8" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding TotalStock}" FontSize="24" FontWeight="Bold" Foreground="#10B981" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Card 3: Low Stock Alert -->
+                        <Border Background="#0F172A" BorderBrush="#EF4444" BorderThickness="1" CornerRadius="10" Padding="16,10" Margin="0,0,12,8" MinWidth="180">
+                            <StackPanel>
+                                <TextBlock Text="CẢNH BÁO SẮP HẾT" FontSize="11" Foreground="#94A3B8" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding LowStockCount}" FontSize="24" FontWeight="Bold" Foreground="#EF4444" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Card 4: Import Today -->
+                        <Border Background="#0F172A" BorderBrush="#6366F1" BorderThickness="1" CornerRadius="10" Padding="16,10" Margin="0,0,12,8" MinWidth="180">
+                            <StackPanel>
+                                <TextBlock Text="NHẬP HÔM NAY" FontSize="11" Foreground="#94A3B8" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding TotalImportToday}" FontSize="24" FontWeight="Bold" Foreground="#818CF8" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Card 5: Export Today -->
+                        <Border Background="#0F172A" BorderBrush="#F59E0B" BorderThickness="1" CornerRadius="10" Padding="16,10" Margin="0,0,12,8" MinWidth="180">
+                            <StackPanel>
+                                <TextBlock Text="XUẤT HÔM NAY" FontSize="11" Foreground="#94A3B8" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding TotalExportToday}" FontSize="24" FontWeight="Bold" Foreground="#FBBF24" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </WrapPanel>
+                </Grid>
+            </Border>
+
+            <!-- 2. NAVIGATION BAR / TABS -->
+            <Border Grid.Row="1" Background="#1E293B" Padding="20,8" BorderBrush="#334155" BorderThickness="0,0,0,1">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Content="📦 Danh Sách Kho"
+                                Command="{Binding SelectTabCommand}" CommandParameter="0"
+                                Background="{Binding IsTab0Selected, Converter={x:Null}}"
+                                Foreground="#F8FAFC" FontWeight="SemiBold" Padding="16,8" CornerRadius="6"/>
+                        <Button Content="📅 Báo Cáo Ngày"
+                                Command="{Binding SelectTabCommand}" CommandParameter="1"
+                                Foreground="#F8FAFC" FontWeight="SemiBold" Padding="16,8" CornerRadius="6"/>
+                        <Button Content="📆 Báo Cáo Tuần"
+                                Command="{Binding SelectTabCommand}" CommandParameter="2"
+                                Foreground="#F8FAFC" FontWeight="SemiBold" Padding="16,8" CornerRadius="6"/>
+                        <Button Content="🗓️ Báo Cáo Tháng"
+                                Command="{Binding SelectTabCommand}" CommandParameter="3"
+                                Foreground="#F8FAFC" FontWeight="SemiBold" Padding="16,8" CornerRadius="6"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- 3. MAIN CONTENT AREA -->
+            <Grid Grid.Row="2" Margin="20,16">
+
+                <!-- TAB 0: QUẢN LÝ KHO (DANH SÁCH SẢN PHẨM) -->
+                <Grid IsVisible="{Binding IsTab0Selected}" RowDefinitions="Auto,*">
+                    <!-- Action Bar -->
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,14">
+                        <TextBox Grid.Column="0" Text="{Binding SearchText, Mode=TwoWay}"
+                                 PlaceholderText="🔍 Tìm kiếm theo Mã hoặc Tên sản phẩm..."
+                                 Padding="12,10" Background="#1E293B" Foreground="#F8FAFC"
+                                 BorderBrush="#475569" CornerRadius="8" MaxWidth="500" HorizontalAlignment="Left"/>
+
+                        <Button Grid.Column="1" Command="{Binding OpenAddProductModalCommand}"
+                                Background="#10B981" Foreground="White" FontWeight="Bold"
+                                Padding="16,10" CornerRadius="8">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="➕" FontSize="14" VerticalAlignment="Center"/>
+                                <TextBlock Text="Thêm Sản Phẩm Mới" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <!-- Product Table / Cards -->
+                    <Border Grid.Row="1" Background="#1E293B" CornerRadius="10" BorderBrush="#334155" BorderThickness="1">
+                        <Grid RowDefinitions="Auto,*">
+                            <!-- Table Header -->
+                            <Border Grid.Row="0" Background="#0F172A" CornerRadius="10,10,0,0" Padding="16,12" BorderBrush="#334155" BorderThickness="0,0,0,1">
+                                <Grid ColumnDefinitions="110,*,80,140,140,120,170">
+                                    <TextBlock Grid.Column="0" Text="Mã SP" FontWeight="Bold" Foreground="#94A3B8"/>
+                                    <TextBlock Grid.Column="1" Text="Tên Sản Phẩm" FontWeight="Bold" Foreground="#94A3B8"/>
+                                    <TextBlock Grid.Column="2" Text="Đơn Vị" FontWeight="Bold" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="3" Text="Ngày Nhập Kho" FontWeight="Bold" Foreground="#94A3B8"/>
+                                    <TextBlock Grid.Column="4" Text="Ngày Xuất Kho" FontWeight="Bold" Foreground="#94A3B8"/>
+                                    <TextBlock Grid.Column="5" Text="Còn Lại" FontWeight="Bold" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="6" Text="Thao Tác Kho" FontWeight="Bold" Foreground="#94A3B8" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Table Items -->
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding Products}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="models:Product">
+                                            <Border BorderBrush="#334155" BorderThickness="0,0,0,1" Padding="16,12">
+                                                <Grid ColumnDefinitions="110,*,80,140,140,120,170" VerticalAlignment="Center">
+                                                    <!-- Mã sản phẩm -->
+                                                    <TextBlock Grid.Column="0" Text="{Binding ProductCode}" FontWeight="SemiBold" Foreground="#38BDF8" VerticalAlignment="Center"/>
+
+                                                    <!-- Tên sản phẩm -->
+                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                                        <TextBlock Text="{Binding ProductName}" Foreground="#F8FAFC" FontWeight="Medium" TextTrimming="CharacterEllipsis"/>
+                                                        <TextBlock Text="{Binding StatusText}" Foreground="{Binding StatusColor}" FontSize="11" FontWeight="SemiBold"/>
+                                                    </StackPanel>
+
+                                                    <!-- Đơn vị -->
+                                                    <TextBlock Grid.Column="2" Text="{Binding Unit}" Foreground="#94A3B8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                                                    <!-- Ngày nhập kho -->
+                                                    <TextBlock Grid.Column="3" Text="{Binding LastImportFormatted}" Foreground="#94A3B8" VerticalAlignment="Center" FontSize="12"/>
+
+                                                    <!-- Ngày xuất kho -->
+                                                    <TextBlock Grid.Column="4" Text="{Binding LastExportFormatted}" Foreground="#94A3B8" VerticalAlignment="Center" FontSize="12"/>
+
+                                                    <!-- Còn lại -->
+                                                    <Border Grid.Column="5" Background="#0F172A" CornerRadius="6" Padding="10,4" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="{Binding StatusColor}" BorderThickness="1">
+                                                        <TextBlock Text="{Binding CurrentStock}" Foreground="{Binding StatusColor}" FontWeight="Bold" FontSize="14"/>
+                                                    </Border>
+
+                                                    <!-- Thao tác: Nhập / Xuất / Xóa -->
+                                                    <StackPanel Grid.Column="6" Orientation="Horizontal" Spacing="6" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                        <Button Content="📥 Nhập"
+                                                                Command="{Binding ((vm:MainViewModel)DataContext).OpenImportModalCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                CommandParameter="{Binding .}"
+                                                                Background="#059669" Foreground="White" FontSize="12" Padding="8,5" CornerRadius="5"/>
+                                                        <Button Content="📤 Xuất"
+                                                                Command="{Binding ((vm:MainViewModel)DataContext).OpenExportModalCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                CommandParameter="{Binding .}"
+                                                                Background="#D97706" Foreground="White" FontSize="12" Padding="8,5" CornerRadius="5"/>
+                                                        <Button Content="🗑️"
+                                                                Command="{Binding ((vm:MainViewModel)DataContext).DeleteProductCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                CommandParameter="{Binding .}"
+                                                                Background="#DC2626" Foreground="White" FontSize="12" Padding="8,5" CornerRadius="5"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- TAB 1: BÁO CÁO NGÀY -->
+                <Grid IsVisible="{Binding IsTab1Selected}" RowDefinitions="Auto,Auto,*">
+                    <!-- Date Picker Filter -->
+                    <Border Grid.Row="0" Background="#1E293B" CornerRadius="10" Padding="16,12" Margin="0,0,0,16" BorderBrush="#334155" BorderThickness="1">
+                        <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                            <TextBlock Text="Chọn Ngày Báo Cáo:" VerticalAlignment="Center" Foreground="#F8FAFC" FontWeight="SemiBold"/>
+                            <DatePicker SelectedDate="{Binding DailyDate, Mode=TwoWay}" VerticalAlignment="Center"/>
+                            <Button Content="🔄 Làm mới" Command="{Binding LoadDailyReportCommand}" Background="#2563EB" Foreground="White" Padding="14,6" CornerRadius="6"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Summary Cards -->
+                    <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="0,0,0,16">
+                        <Border Grid.Column="0" Background="#1E293B" BorderBrush="#10B981" BorderThickness="1" CornerRadius="10" Padding="20,14" Margin="0,0,8,0">
+                            <StackPanel>
+                                <TextBlock Text="TỔNG NHẬP TRONG NGÀY" FontSize="12" Foreground="#94A3B8" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding DailyTotalImport}" FontSize="28" FontWeight="Bold" Foreground="#10B981" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="1" Background="#1E293B" BorderBrush="#EF4444" BorderThickness="1" CornerRadius="10" Padding="20,14" Margin="8,0,0,0">
+                            <StackPanel>
+                                <TextBlock Text="TỔNG XUẤT TRONG NGÀY" FontSize="12" Foreground="#94A3B8" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding DailyTotalExport}" FontSize="28" FontWeight="Bold" Foreground="#EF4444" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Transactions in day -->
+                    <Border Grid.Row="2" Background="#1E293B" CornerRadius="10" BorderBrush="#334155" BorderThickness="1">
+                        <Grid RowDefinitions="Auto,*">
+                            <Border Grid.Row="0" Background="#0F172A" CornerRadius="10,10,0,0" Padding="16,12" BorderBrush="#334155" BorderThickness="0,0,0,1">
+                                <Grid ColumnDefinitions="140,110,*,100,80,*">
+                                    <TextBlock Grid.Column="0" Text="Thời Gian" FontWeight="Bold" Foreground="#94A3B8"/>
+                                    <TextBlock Grid.Column="1" Text="Mã SP" FontWeight="Bold" Foreground="#94A3B8"/>
+                                    <TextBlock Grid.Column="2" Text="Tên Sản Phẩm" FontWeight="Bold" Foreground="#94A3B8"/>
+                                    <TextBlock Grid.Column="3" Text="Loại Phiếu" FontWeight="Bold" Foreground="#94A3B8"/>
+                                    <TextBlock Grid.Column="4" Text="Số Lượng" FontWeight="Bold" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="5" Text="Ghi Chú" FontWeight="Bold" Foreground="#94A3B8"/>
+                                </Grid>
+                            </Border>
+
+                            <ScrollViewer Grid.Row="1">
+                                <ItemsControl ItemsSource="{Binding DailyTransactions}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="models:StockTransaction">
+                                            <Border BorderBrush="#334155" BorderThickness="0,0,0,1" Padding="16,12">
+                                                <Grid ColumnDefinitions="140,110,*,100,80,*">
+                                                    <TextBlock Grid.Column="0" Text="{Binding FormattedDate}" Foreground="#94A3B8" FontSize="12" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="1" Text="{Binding ProductCode}" Foreground="#38BDF8" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="2" Text="{Binding ProductName}" Foreground="#F8FAFC" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="3" Text="{Binding TypeText}" Foreground="{Binding TypeColor}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="4" Text="{Binding Quantity}" Foreground="#F8FAFC" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="5" Text="{Binding Note}" Foreground="#94A3B8" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- TAB 2: BÁO CÁO TUẦN -->
+                <Grid IsVisible="{Binding IsTab2Selected}" RowDefinitions="Auto,Auto,*">
+                    <!-- Week Header -->
+                    <Border Grid.Row="0" Background="#1E293B" CornerRadius="10" Padding="16,12" Margin="0,0,0,16" BorderBrush="#334155" BorderThickness="1">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="Biến Động Kho 7 Ngày Gần Nhất" FontSize="16" FontWeight="Bold" Foreground="#F8FAFC" VerticalAlignment="Center"/>
+                            <Button Grid.Column="1" Content="🔄 Cập Nhật" Command="{Binding LoadWeeklyReportCommand}" Background="#2563EB" Foreground="White" Padding="14,6" CornerRadius="6"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Summary Cards -->
+                    <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="0,0,0,16">
+                        <Border Grid.Column="0" Background="#1E293B" BorderBrush="#10B981" BorderThickness="1" CornerRadius="10" Padding="20,14" Margin="0,0,8,0">
+                            <StackPanel>
+                                <TextBlock Text="TỔNG NHẬP 7 NGÀY" FontSize="12" Foreground="#94A3B8" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding WeeklyTotalImport}" FontSize="28" FontWeight="Bold" Foreground="#10B981" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="1" Background="#1E293B" BorderBrush="#EF4444" BorderThickness="1" CornerRadius="10" Padding="20,14" Margin="8,0,0,0">
+                            <StackPanel>
+                                <TextBlock Text="TỔNG XUẤT 7 NGÀY" FontSize="12" Foreground="#94A3B8" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding WeeklyTotalExport}" FontSize="28" FontWeight="Bold" Foreground="#EF4444" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- 7-day breakdown -->
+                    <Border Grid.Row="2" Background="#1E293B" CornerRadius="10" BorderBrush="#334155" BorderThickness="1">
+                        <Grid RowDefinitions="Auto,*">
+                            <Border Grid.Row="0" Background="#0F172A" CornerRadius="10,10,0,0" Padding="16,12" BorderBrush="#334155" BorderThickness="0,0,0,1">
+                                <Grid ColumnDefinitions="140,140,*,*,*">
+                                    <TextBlock Grid.Column="0" Text="Thứ / Ngày" FontWeight="Bold" Foreground="#94A3B8"/>
+                                    <TextBlock Grid.Column="1" Text="Ngày" FontWeight="Bold" Foreground="#94A3B8"/>
+                                    <TextBlock Grid.Column="2" Text="Tổng Nhập" FontWeight="Bold" Foreground="#10B981" HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="3" Text="Tổng Xuất" FontWeight="Bold" Foreground="#EF4444" HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="4" Text="Chênh Lệch Kho" FontWeight="Bold" Foreground="#38BDF8" HorizontalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <ScrollViewer Grid.Row="1">
+                                <ItemsControl ItemsSource="{Binding WeeklyItems}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="models:WeeklyReportItem">
+                                            <Border BorderBrush="#334155" BorderThickness="0,0,0,1" Padding="16,14">
+                                                <Grid ColumnDefinitions="140,140,*,*,*">
+                                                    <TextBlock Grid.Column="0" Text="{Binding DayName}" FontWeight="SemiBold" Foreground="#F8FAFC" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="1" Text="{Binding FormattedDate}" Foreground="#94A3B8" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="2" Text="{Binding TotalImport}" Foreground="#10B981" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="3" Text="{Binding TotalExport}" Foreground="#EF4444" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="4" Text="{Binding DiffText}" Foreground="{Binding DiffColor}" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- TAB 3: BÁO CÁO THÁNG -->
+                <Grid IsVisible="{Binding IsTab3Selected}" RowDefinitions="Auto,Auto,*">
+                    <!-- Month / Year Selector -->
+                    <Border Grid.Row="0" Background="#1E293B" CornerRadius="10" Padding="16,12" Margin="0,0,0,16" BorderBrush="#334155" BorderThickness="1">
+                        <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                            <TextBlock Text="Tháng:" Foreground="#F8FAFC" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <NumericUpDown Value="{Binding SelectedMonth, Mode=TwoWay}" Minimum="1" Maximum="12" Width="100"/>
+                            <TextBlock Text="Năm:" Foreground="#F8FAFC" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <NumericUpDown Value="{Binding SelectedYear, Mode=TwoWay}" Minimum="2020" Maximum="2099" Width="120"/>
+                            <Button Content="🔍 Xem Báo Cáo" Command="{Binding LoadMonthlyReportCommand}" Background="#2563EB" Foreground="White" Padding="16,6" CornerRadius="6"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Monthly Summary Cards -->
+                    <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="0,0,0,16">
+                        <Border Grid.Column="0" Background="#1E293B" BorderBrush="#10B981" BorderThickness="1" CornerRadius="10" Padding="20,14" Margin="0,0,8,0">
+                            <StackPanel>
+                                <TextBlock Text="TỔNG NHẬP TRONG THÁNG" FontSize="12" Foreground="#94A3B8" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding MonthlyTotalImport}" FontSize="28" FontWeight="Bold" Foreground="#10B981" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="1" Background="#1E293B" BorderBrush="#EF4444" BorderThickness="1" CornerRadius="10" Padding="20,14" Margin="8,0,0,0">
+                            <StackPanel>
+                                <TextBlock Text="TỔNG XUẤT TRONG THÁNG" FontSize="12" Foreground="#94A3B8" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding MonthlyTotalExport}" FontSize="28" FontWeight="Bold" Foreground="#EF4444" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Top 5 Best-Selling Products -->
+                    <Border Grid.Row="2" Background="#1E293B" CornerRadius="10" BorderBrush="#334155" BorderThickness="1">
+                        <Grid RowDefinitions="Auto,*">
+                            <Border Grid.Row="0" Background="#0F172A" CornerRadius="10,10,0,0" Padding="16,12" BorderBrush="#334155" BorderThickness="0,0,0,1">
+                                <TextBlock Text="Top 5 Mặt Hàng Xuất Nhiều Nhất Trong Tháng" FontWeight="Bold" Foreground="#F8FAFC" FontSize="14"/>
+                            </Border>
+
+                            <ScrollViewer Grid.Row="1">
+                                <ItemsControl ItemsSource="{Binding MonthlyTopProducts}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="models:Product">
+                                            <Border BorderBrush="#334155" BorderThickness="0,0,0,1" Padding="16,14">
+                                                <Grid ColumnDefinitions="120,*,120,120">
+                                                    <TextBlock Grid.Column="0" Text="{Binding ProductCode}" Foreground="#38BDF8" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                    <TextBlock Grid.Column="1" Text="{Binding ProductName}" Foreground="#F8FAFC" FontWeight="Medium" VerticalAlignment="Center"/>
+                                                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                                        <TextBlock Text="Đã xuất:" Foreground="#94A3B8"/>
+                                                        <TextBlock Text="{Binding TotalExport}" Foreground="#EF4444" FontWeight="Bold"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                                        <TextBlock Text="Còn tồn:" Foreground="#94A3B8"/>
+                                                        <TextBlock Text="{Binding CurrentStock}" Foreground="#10B981" FontWeight="Bold"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <!-- 4. MODAL: THÊM SẢN PHẨM MỚI -->
+        <Border IsVisible="{Binding IsAddProductModalVisible}" Background="#80000000">
+            <Border Background="#1E293B" BorderBrush="#475569" BorderThickness="1" CornerRadius="12" Width="480" VerticalAlignment="Center" Padding="24" BoxShadow="0 10 25 #000000">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="➕ Thêm Sản Phẩm Mới Vào Kho" FontSize="18" FontWeight="Bold" Foreground="#F8FAFC"/>
+                    <Separator Background="#334155"/>
+
+                    <TextBlock Text="Mã Sản Phẩm (*):" Foreground="#94A3B8" FontSize="12"/>
+                    <TextBox Text="{Binding NewProductCode, Mode=TwoWay}" PlaceholderText="Ví dụ: SP006" Padding="10,8" Background="#0F172A" Foreground="White" BorderBrush="#475569" CornerRadius="6"/>
+
+                    <TextBlock Text="Tên Sản Phẩm (*):" Foreground="#94A3B8" FontSize="12"/>
+                    <TextBox Text="{Binding NewProductName, Mode=TwoWay}" PlaceholderText="Ví dụ: Ổ cứng SSD Samsung 500GB" Padding="10,8" Background="#0F172A" Foreground="White" BorderBrush="#475569" CornerRadius="6"/>
+
+                    <Grid ColumnDefinitions="*,*">
+                        <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                            <TextBlock Text="Đơn vị tính:" Foreground="#94A3B8" FontSize="12"/>
+                            <TextBox Text="{Binding NewProductUnit, Mode=TwoWay}" PlaceholderText="Cái, Chiếc, Thùng..." Padding="10,8" Background="#0F172A" Foreground="White" BorderBrush="#475569" CornerRadius="6"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                            <TextBlock Text="Số lượng nhập ban đầu:" Foreground="#94A3B8" FontSize="12"/>
+                            <NumericUpDown Value="{Binding NewProductInitialStock, Mode=TwoWay}" Minimum="0" Maximum="999999"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Text="Ngưỡng cảnh báo sắp hết:" Foreground="#94A3B8" FontSize="12"/>
+                    <NumericUpDown Value="{Binding NewProductMinAlert, Mode=TwoWay}" Minimum="0" Maximum="9999"/>
+
+                    <!-- Error message -->
+                    <TextBlock Text="{Binding AddProductError}" Foreground="#EF4444" FontWeight="SemiBold" TextWrapping="Wrap" IsVisible="{Binding AddProductError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+                    <!-- Action buttons -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,10,0,0">
+                        <Button Content="Hủy" Command="{Binding CloseAddProductModalCommand}" Background="#475569" Foreground="White" Padding="18,8" CornerRadius="6"/>
+                        <Button Content="💾 Lưu Sản Phẩm" Command="{Binding SubmitAddProductCommand}" Background="#10B981" Foreground="White" FontWeight="Bold" Padding="18,8" CornerRadius="6"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- 5. MODAL: NHẬP KHO / XUẤT KHO -->
+        <Border IsVisible="{Binding IsTransactionModalVisible}" Background="#80000000">
+            <Border Background="#1E293B" BorderBrush="#475569" BorderThickness="1" CornerRadius="12" Width="480" VerticalAlignment="Center" Padding="24" BoxShadow="0 10 25 #000000">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="{Binding TransactionModalTitle}" FontSize="18" FontWeight="Bold" Foreground="#F8FAFC"/>
+                    <Separator Background="#334155"/>
+
+                    <TextBlock Text="Số lượng thao tác (*):" Foreground="#94A3B8" FontSize="12"/>
+                    <NumericUpDown Value="{Binding TransactionQuantity, Mode=TwoWay}" Minimum="1" Maximum="999999"/>
+
+                    <TextBlock Text="Ghi chú / Lý do:" Foreground="#94A3B8" FontSize="12"/>
+                    <TextBox Text="{Binding TransactionNote, Mode=TwoWay}" PlaceholderText="Ví dụ: Bán buôn đại lý / Nhập bổ sung đợt 2" Padding="10,8" Background="#0F172A" Foreground="White" BorderBrush="#475569" CornerRadius="6"/>
+
+                    <!-- Error message -->
+                    <TextBlock Text="{Binding TransactionError}" Foreground="#EF4444" FontWeight="SemiBold" TextWrapping="Wrap" IsVisible="{Binding TransactionError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+                    <!-- Action buttons -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,10,0,0">
+                        <Button Content="Hủy" Command="{Binding CloseTransactionModalCommand}" Background="#475569" Foreground="White" Padding="18,8" CornerRadius="6"/>
+                        <Button Content="Xác Nhận Thao Tác" Command="{Binding SubmitTransactionCommand}" Background="#2563EB" Foreground="White" FontWeight="Bold" Padding="18,8" CornerRadius="6"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>
