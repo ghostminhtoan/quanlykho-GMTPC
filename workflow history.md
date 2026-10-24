@@ -32,3 +32,4 @@
   - Triển khai 3 phân hệ Báo cáo chuyên sâu: Báo cáo Ngày (phiếu giao dịch chi tiết), Báo cáo Tuần (biến động 7 ngày), Báo cáo Tháng (tổng kết nhập/xuất/tồn + Top 5 sản phẩm bán chạy).
   - Tích hợp hệ thống lưu trữ ngoại tuyến Offline-First bằng SQLite (`sqlite-net-pcl`).
 - **Trạng thái**: Build thành công trên cả Windows Desktop (.exe) và Android (.apk).
+

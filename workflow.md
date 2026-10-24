@@ -96,3 +96,4 @@ Tài liệu quy tắc kỹ thuật, kiến trúc mã nguồn và luồng xử l�
 ## 6. Sổ tay Theo dõi & Nhật ký Phát triển (History Logs)
 - 📜 [`workflow history.md`](workflow%20history.md): Nhật ký theo dõi toàn bộ tính năng và thay đổi sau mỗi phiên làm việc.
 - 🛠️ [`bug fixes history.md`](bug%20fixes%20history.md): Sổ tay lưu vết toàn bộ lỗi, phân tích nguyên nhân gốc rễ và cẩm nang giải pháp phòng ngừa vĩnh viễn.
+

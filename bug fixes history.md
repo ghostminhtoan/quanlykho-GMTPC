@@ -55,3 +55,4 @@
   - Trong `sqlite-net-pcl`, tuyệt đối **không bao giờ** kết hợp `[Indexed]` và `[Unique]` trên cùng một property. Luôn dùng `[Indexed(Unique = true)]`.
   - Mọi hàm Service có thao tác I/O khởi tạo bất đồng bộ (`InitializeAsync`) bắt buộc phải dùng `SemaphoreSlim` để ngăn chặn race condition.
   - Toàn bộ `[RelayCommand]` gọi đến Service hoặc Database trong ViewModel bắt buộc phải có khối `try ... catch` để bắt lỗi và hiển thị thân thiện trên UI.
+
