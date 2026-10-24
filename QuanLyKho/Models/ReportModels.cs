@@ -22,3 +22,4 @@ public class KpiSummary
     public int TotalImportToday { get; set; }
     public int TotalExportToday { get; set; }
 }
+

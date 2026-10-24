@@ -84,7 +84,6 @@
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <Button Content="📦 Danh Sách Kho"
                                 Command="{Binding SelectTabCommand}" CommandParameter="0"
-                                Background="{Binding IsTab0Selected, Converter={x:Null}}"
                                 Foreground="#F8FAFC" FontWeight="SemiBold" Padding="16,8" CornerRadius="6"/>
                         <Button Content="📅 Báo Cáo Ngày"
                                 Command="{Binding SelectTabCommand}" CommandParameter="1"
@@ -108,8 +107,7 @@
                     <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,14">
                         <TextBox Grid.Column="0" Text="{Binding SearchText, Mode=TwoWay}"
                                  PlaceholderText="🔍 Tìm kiếm theo Mã hoặc Tên sản phẩm..."
-                                 Padding="12,10" Background="#1E293B" Foreground="#F8FAFC"
-                                 BorderBrush="#475569" CornerRadius="8" MaxWidth="500" HorizontalAlignment="Left"/>
+                                 Padding="12,10" MaxWidth="500" HorizontalAlignment="Left"/>
 
                         <Button Grid.Column="1" Command="{Binding OpenAddProductModalCommand}"
                                 Background="#10B981" Foreground="White" FontWeight="Bold"
@@ -387,15 +385,15 @@
                     <Separator Background="#334155"/>
 
                     <TextBlock Text="Mã Sản Phẩm (*):" Foreground="#94A3B8" FontSize="12"/>
-                    <TextBox Text="{Binding NewProductCode, Mode=TwoWay}" PlaceholderText="Ví dụ: SP006" Padding="10,8" Background="#0F172A" Foreground="White" BorderBrush="#475569" CornerRadius="6"/>
+                    <TextBox Text="{Binding NewProductCode, Mode=TwoWay}" PlaceholderText="Ví dụ: SP006" Padding="10,8"/>
 
                     <TextBlock Text="Tên Sản Phẩm (*):" Foreground="#94A3B8" FontSize="12"/>
-                    <TextBox Text="{Binding NewProductName, Mode=TwoWay}" PlaceholderText="Ví dụ: Ổ cứng SSD Samsung 500GB" Padding="10,8" Background="#0F172A" Foreground="White" BorderBrush="#475569" CornerRadius="6"/>
+                    <TextBox Text="{Binding NewProductName, Mode=TwoWay}" PlaceholderText="Ví dụ: Ổ cứng SSD Samsung 500GB" Padding="10,8"/>
 
                     <Grid ColumnDefinitions="*,*">
                         <StackPanel Grid.Column="0" Margin="0,0,8,0">
                             <TextBlock Text="Đơn vị tính:" Foreground="#94A3B8" FontSize="12"/>
-                            <TextBox Text="{Binding NewProductUnit, Mode=TwoWay}" PlaceholderText="Cái, Chiếc, Thùng..." Padding="10,8" Background="#0F172A" Foreground="White" BorderBrush="#475569" CornerRadius="6"/>
+                            <TextBox Text="{Binding NewProductUnit, Mode=TwoWay}" PlaceholderText="Cái, Chiếc, Thùng..." Padding="10,8"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Margin="8,0,0,0">
                             <TextBlock Text="Số lượng nhập ban đầu:" Foreground="#94A3B8" FontSize="12"/>
@@ -429,7 +427,7 @@
                     <NumericUpDown Value="{Binding TransactionQuantity, Mode=TwoWay}" Minimum="1" Maximum="999999"/>
 
                     <TextBlock Text="Ghi chú / Lý do:" Foreground="#94A3B8" FontSize="12"/>
-                    <TextBox Text="{Binding TransactionNote, Mode=TwoWay}" PlaceholderText="Ví dụ: Bán buôn đại lý / Nhập bổ sung đợt 2" Padding="10,8" Background="#0F172A" Foreground="White" BorderBrush="#475569" CornerRadius="6"/>
+                    <TextBox Text="{Binding TransactionNote, Mode=TwoWay}" PlaceholderText="Ví dụ: Bán buôn đại lý / Nhập bổ sung đợt 2" Padding="10,8"/>
 
                     <!-- Error message -->
                     <TextBlock Text="{Binding TransactionError}" Foreground="#EF4444" FontWeight="SemiBold" TextWrapping="Wrap" IsVisible="{Binding TransactionError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>

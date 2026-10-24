@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using SQLite;
 using QuanLyKho.Models;
@@ -15,6 +16,8 @@ public class DatabaseService
 
     private SQLiteAsyncConnection? _database;
     private readonly string _dbPath;
+    private readonly SemaphoreSlim _initLock = new(1, 1);
+    private bool _isInitialized;
 
     public DatabaseService()
     {
@@ -38,17 +41,33 @@ public class DatabaseService
 
     public async Task InitializeAsync()
     {
-        if (_database != null) return;
+        if (_isInitialized) return;
 
-        _database = new SQLiteAsyncConnection(_dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create | SQLiteOpenFlags.SharedCache);
-        
-        await _database.CreateTableAsync<Product>();
-        await _database.CreateTableAsync<StockTransaction>();
-
-        var count = await _database.Table<Product>().CountAsync();
-        if (count == 0)
+        await _initLock.WaitAsync();
+        try
         {
-            await SeedInitialDataAsync();
+            if (_isInitialized) return;
+
+            if (_database == null)
+            {
+                _database = new SQLiteAsyncConnection(_dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create | SQLiteOpenFlags.SharedCache);
+            }
+
+            // Đảm bảo tạo tuần tự và đầy đủ cả 2 bảng
+            await _database.CreateTableAsync<Product>();
+            await _database.CreateTableAsync<StockTransaction>();
+
+            var count = await _database.Table<Product>().CountAsync();
+            if (count == 0)
+            {
+                await SeedInitialDataAsync();
+            }
+
+            _isInitialized = true;
+        }
+        finally
+        {
+            _initLock.Release();
         }
     }
 
@@ -272,11 +291,9 @@ public class DatabaseService
             Note = note
         };
 
-        await _database.RunInTransactionAsync(tran =>
-        {
-            tran.Update(product);
-            tran.Insert(transaction);
-        });
+        // Ghi transaction và update product an toàn
+        await _database.InsertAsync(transaction);
+        await _database.UpdateAsync(product);
     }
 
     public async Task<KpiSummary> GetKpiSummaryAsync()

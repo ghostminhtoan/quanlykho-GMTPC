@@ -37,3 +37,4 @@ public class StockTransaction
     [Ignore]
     public string FormattedDate => TransactionDate.ToString("dd/MM/yyyy HH:mm");
 }
+

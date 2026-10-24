@@ -9,7 +9,7 @@ public class Product
     [PrimaryKey, AutoIncrement]
     public int Id { get; set; }
 
-    [Indexed, Unique, MaxLength(50)]
+    [Indexed(Unique = true), MaxLength(50)]
     public string ProductCode { get; set; } = string.Empty;
 
     [MaxLength(200)]

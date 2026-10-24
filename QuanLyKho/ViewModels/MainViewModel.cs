@@ -17,7 +17,7 @@ public partial class MainViewModel : ViewModelBase
 
     public MainViewModel()
     {
-        CurrentTimeText = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+        _currentTimeText = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
         _clockTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromSeconds(1)
@@ -28,20 +28,28 @@ public partial class MainViewModel : ViewModelBase
         };
         _clockTimer.Start();
 
-        DailyDate = DateTimeOffset.Now;
-        SelectedMonth = DateTime.Now.Month;
-        SelectedYear = DateTime.Now.Year;
+        _dailyDate = DateTimeOffset.Now;
+        _selectedMonth = DateTime.Now.Month;
+        _selectedYear = DateTime.Now.Year;
 
         _ = InitializeAppAsync();
     }
 
     private async Task InitializeAppAsync()
     {
-        await LoadProductsAsync();
-        await RefreshKpiAsync();
-        await LoadDailyReportAsync();
-        await LoadWeeklyReportAsync();
-        await LoadMonthlyReportAsync();
+        try
+        {
+            await _db.InitializeAsync();
+            await LoadProductsAsync();
+            await RefreshKpiAsync();
+            await LoadDailyReportAsync();
+            await LoadWeeklyReportAsync();
+            await LoadMonthlyReportAsync();
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Lỗi khởi tạo: {ex.Message}";
+        }
     }
 
     #region Banner KPI & Clock
@@ -65,12 +73,19 @@ public partial class MainViewModel : ViewModelBase
 
     private async Task RefreshKpiAsync()
     {
-        var kpi = await _db.GetKpiSummaryAsync();
-        TotalProducts = kpi.TotalProducts;
-        TotalStock = kpi.TotalStock;
-        LowStockCount = kpi.LowStockCount;
-        TotalImportToday = kpi.TotalImportToday;
-        TotalExportToday = kpi.TotalExportToday;
+        try
+        {
+            var kpi = await _db.GetKpiSummaryAsync();
+            TotalProducts = kpi.TotalProducts;
+            TotalStock = kpi.TotalStock;
+            LowStockCount = kpi.LowStockCount;
+            TotalImportToday = kpi.TotalImportToday;
+            TotalExportToday = kpi.TotalExportToday;
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Lỗi cập nhật KPI: {ex.Message}";
+        }
     }
     #endregion
 
@@ -133,6 +148,10 @@ public partial class MainViewModel : ViewModelBase
                 Products.Add(p);
             }
         }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Lỗi tải sản phẩm: {ex.Message}";
+        }
         finally
         {
             IsLoading = false;
@@ -184,49 +203,56 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task SubmitAddProductAsync()
     {
-        if (string.IsNullOrWhiteSpace(NewProductCode))
+        try
         {
-            AddProductError = "Vui lòng nhập mã sản phẩm.";
-            return;
-        }
-        if (string.IsNullOrWhiteSpace(NewProductName))
-        {
-            AddProductError = "Vui lòng nhập tên sản phẩm.";
-            return;
-        }
-
-        var existing = await _db.GetProductByCodeAsync(NewProductCode.Trim());
-        if (existing != null)
-        {
-            AddProductError = "Mã sản phẩm này đã tồn tại.";
-            return;
-        }
-
-        var product = new Product
-        {
-            ProductCode = NewProductCode.Trim().ToUpperInvariant(),
-            ProductName = NewProductName.Trim(),
-            Unit = string.IsNullOrWhiteSpace(NewProductUnit) ? "Cái" : NewProductUnit.Trim(),
-            CurrentStock = Math.Max(0, NewProductInitialStock),
-            TotalImport = Math.Max(0, NewProductInitialStock),
-            MinStockAlert = Math.Max(0, NewProductMinAlert),
-            LastImportDate = NewProductInitialStock > 0 ? DateTime.Now : null
-        };
-
-        await _db.AddProductAsync(product);
-
-        if (NewProductInitialStock > 0)
-        {
-            var created = await _db.GetProductByCodeAsync(product.ProductCode);
-            if (created != null)
+            if (string.IsNullOrWhiteSpace(NewProductCode))
             {
-                await _db.ProcessTransactionAsync(created.Id, "NHAP", NewProductInitialStock, "Nhập tồn kho ban đầu khi tạo sản phẩm", DateTime.Now);
+                AddProductError = "Vui lòng nhập mã sản phẩm.";
+                return;
             }
-        }
+            if (string.IsNullOrWhiteSpace(NewProductName))
+            {
+                AddProductError = "Vui lòng nhập tên sản phẩm.";
+                return;
+            }
 
-        IsAddProductModalVisible = false;
-        await LoadProductsAsync();
-        await RefreshKpiAsync();
+            var existing = await _db.GetProductByCodeAsync(NewProductCode.Trim());
+            if (existing != null)
+            {
+                AddProductError = "Mã sản phẩm này đã tồn tại.";
+                return;
+            }
+
+            var product = new Product
+            {
+                ProductCode = NewProductCode.Trim().ToUpperInvariant(),
+                ProductName = NewProductName.Trim(),
+                Unit = string.IsNullOrWhiteSpace(NewProductUnit) ? "Cái" : NewProductUnit.Trim(),
+                CurrentStock = Math.Max(0, NewProductInitialStock),
+                TotalImport = Math.Max(0, NewProductInitialStock),
+                MinStockAlert = Math.Max(0, NewProductMinAlert),
+                LastImportDate = NewProductInitialStock > 0 ? DateTime.Now : null
+            };
+
+            await _db.AddProductAsync(product);
+
+            if (NewProductInitialStock > 0)
+            {
+                var created = await _db.GetProductByCodeAsync(product.ProductCode);
+                if (created != null)
+                {
+                    await _db.ProcessTransactionAsync(created.Id, "NHAP", NewProductInitialStock, "Nhập tồn kho ban đầu khi tạo sản phẩm", DateTime.Now);
+                }
+            }
+
+            IsAddProductModalVisible = false;
+            await LoadProductsAsync();
+            await RefreshKpiAsync();
+        }
+        catch (Exception ex)
+        {
+            AddProductError = $"Lỗi: {ex.Message}";
+        }
     }
     #endregion
 
@@ -325,20 +351,27 @@ public partial class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            TransactionError = ex.Message;
+            TransactionError = $"Lỗi: {ex.Message}";
         }
     }
 
     [RelayCommand]
     private async Task DeleteProductAsync(Product? product)
     {
-        var target = product ?? SelectedProduct;
-        if (target == null) return;
+        try
+        {
+            var target = product ?? SelectedProduct;
+            if (target == null) return;
 
-        await _db.DeleteProductAsync(target.Id);
-        await LoadProductsAsync();
-        await RefreshKpiAsync();
-        await LoadDailyReportAsync();
+            await _db.DeleteProductAsync(target.Id);
+            await LoadProductsAsync();
+            await RefreshKpiAsync();
+            await LoadDailyReportAsync();
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Lỗi xóa: {ex.Message}";
+        }
     }
     #endregion
 
@@ -362,15 +395,22 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task LoadDailyReportAsync()
     {
-        var list = await _db.GetDailyTransactionsAsync(DailyDate.DateTime);
-        DailyTransactions.Clear();
-        foreach (var t in list)
+        try
         {
-            DailyTransactions.Add(t);
-        }
+            var list = await _db.GetDailyTransactionsAsync(DailyDate.DateTime);
+            DailyTransactions.Clear();
+            foreach (var t in list)
+            {
+                DailyTransactions.Add(t);
+            }
 
-        DailyTotalImport = list.Where(t => t.TransactionType == "NHAP").Sum(t => t.Quantity);
-        DailyTotalExport = list.Where(t => t.TransactionType == "XUAT").Sum(t => t.Quantity);
+            DailyTotalImport = list.Where(t => t.TransactionType == "NHAP").Sum(t => t.Quantity);
+            DailyTotalExport = list.Where(t => t.TransactionType == "XUAT").Sum(t => t.Quantity);
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Lỗi báo cáo ngày: {ex.Message}";
+        }
     }
     #endregion
 
@@ -386,15 +426,22 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task LoadWeeklyReportAsync()
     {
-        var list = await _db.GetWeeklyReportAsync(DateTime.Today);
-        WeeklyItems.Clear();
-        foreach (var item in list)
+        try
         {
-            WeeklyItems.Add(item);
-        }
+            var list = await _db.GetWeeklyReportAsync(DateTime.Today);
+            WeeklyItems.Clear();
+            foreach (var item in list)
+            {
+                WeeklyItems.Add(item);
+            }
 
-        WeeklyTotalImport = list.Sum(x => x.TotalImport);
-        WeeklyTotalExport = list.Sum(x => x.TotalExport);
+            WeeklyTotalImport = list.Sum(x => x.TotalImport);
+            WeeklyTotalExport = list.Sum(x => x.TotalExport);
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Lỗi báo cáo tuần: {ex.Message}";
+        }
     }
     #endregion
 
@@ -416,14 +463,21 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task LoadMonthlyReportAsync()
     {
-        var (totalImport, totalExport, topProducts) = await _db.GetMonthlyReportAsync(SelectedMonth, SelectedYear);
-        MonthlyTotalImport = totalImport;
-        MonthlyTotalExport = totalExport;
-
-        MonthlyTopProducts.Clear();
-        foreach (var p in topProducts)
+        try
         {
-            MonthlyTopProducts.Add(p);
+            var (totalImport, totalExport, topProducts) = await _db.GetMonthlyReportAsync(SelectedMonth, SelectedYear);
+            MonthlyTotalImport = totalImport;
+            MonthlyTotalExport = totalExport;
+
+            MonthlyTopProducts.Clear();
+            foreach (var p in topProducts)
+            {
+                MonthlyTopProducts.Add(p);
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Lỗi báo cáo tháng: {ex.Message}";
         }
     }
     #endregion
