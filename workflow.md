@@ -12,6 +12,9 @@ Tài liệu quy tắc kỹ thuật, kiến trúc mã nguồn và luồng xử l�
 - **Quy tắc Git & An toàn Mã nguồn**:
   - **Chỉ commit local** theo định dạng Conventional Commits (`<type>(<scope>): <mô tả>`).
   - **TUYỆT ĐỐI KHÔNG TỰ Ý PUSH GITHUB** trừ khi người dùng ra chỉ thị yêu cầu rõ ràng.
+- **Quy tắc Duy trì Nhật ký Lịch sử (Bắt buộc)**:
+  - **Sau mỗi lần code xong**: Bắt buộc cập nhật tóm tắt công việc vào [`workflow history.md`](workflow%20history.md) (mục mới nhất ở trên cùng, cũ ở dưới).
+  - **Sau mỗi lần sửa lỗi xong**: Bắt buộc ghi nhận triệu chứng, nguyên nhân gốc rễ (5 Whys), cách fix và giải pháp phòng ngừa vào [`bug fixes history.md`](bug%20fixes%20history.md) (mục mới nhất ở trên cùng, cũ ở dưới).
 - **Trạng thái chuẩn cuối mỗi phản hồi**:
   ```text
   commit local: <mã hash>
@@ -87,3 +90,9 @@ Tài liệu quy tắc kỹ thuật, kiến trúc mã nguồn và luồng xử l�
   ```powershell
   dotnet build QuanLyKho.Android\QuanLyKho.Android.csproj
   ```
+
+---
+
+## 6. Sổ tay Theo dõi & Nhật ký Phát triển (History Logs)
+- 📜 [`workflow history.md`](workflow%20history.md): Nhật ký theo dõi toàn bộ tính năng và thay đổi sau mỗi phiên làm việc.
+- 🛠️ [`bug fixes history.md`](bug%20fixes%20history.md): Sổ tay lưu vết toàn bộ lỗi, phân tích nguyên nhân gốc rễ và cẩm nang giải pháp phòng ngừa vĩnh viễn.
